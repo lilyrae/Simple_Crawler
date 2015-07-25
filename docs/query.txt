@@ -1,0 +1,7 @@
+//SQL query for checking if user ($USERNAME) is admin
+
+SELECT m.ID, m.Email, m.Name, mt.Member_Type AS Type
+FROM Members AS m
+INNER JOIN Members_Type AS mt
+ON m.ID = mt.Member_ID
+WHERE mt.Member_Type = "admin" AND m.Name = $USERNAME
