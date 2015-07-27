@@ -16,6 +16,8 @@ if (check_login($mysqli, 'admin') == false) {
 	<title>Crawler Results</title>
 </head>
 <body>
-bnlafjdsafnhkfndska
+	<?php
+	display_crawler($mysqli_crawler);
+	?>
 </body>
 </html>
