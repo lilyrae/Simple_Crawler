@@ -109,7 +109,7 @@ function checkbrute($user_id, $mysqli) {
 	if ($stmt = $mysqli ->prepare("SELECT Time
 								FROM login_attempts
 								WHERE user_ID = ?
-								AND Time > '$valid_attempts")) {
+								AND Time > '$valid_attempts'")) {
 
 		//execute query
 		$stmt->bind_param('i', $user_id);
@@ -178,4 +178,36 @@ function check_login($mysqli, $type) {
 		return false;
 	}
 
+}
+
+function display_crawler($mysqli_crawler, $page, $per_page) {
+
+ 	// set offset for displayings results from sql query
+	$offset = ($page - 1) * $per_page;
+
+	if ($stmt = $mysqli_crawler->prepare("SELECT * FROM Article_Summary LIMIT $offset, $per_page")) {
+		$stmt->execute();
+		$stmt->bind_result($ID, $title, $date, $author, $tease, $source, $updated);
+
+		echo '<table border="1" style="width:100%">';
+
+		while($stmt->fetch()){
+			echo '<tr><td>' . $ID . '</td><td>' . $title . '</td><td>' . $date . '</td><td>' . $author . '</td><td>' . $tease . '</td><td>' . $source . '</td><td>' . $updated . '.</td><td><input type="button" value="View" onclick="location.href=\'crawler_article.php?id=' . $ID . '\';"/></td></tr>';
+		}
+		echo '</table>';
+
+		$stmt->close();
+	}
+
+}
+
+function count_rows($mysqli_crawler) {
+
+	if ($count = $mysqli_crawler->query("SELECT COUNT(*) FROM Article_Summary")) {
+
+		// determine number of results in query
+	 	$row_count = $count->fetch_row();
+	 	$count->close();
+	 	return $row_count[0];
+	 }
 }
