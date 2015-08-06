@@ -192,7 +192,7 @@ function display_crawler($mysqli_crawler, $page, $per_page) {
 		echo '<table border="1" style="width:100%">';
 
 		while($stmt->fetch()){
-			echo '<tr><td>' . $ID . '</td><td>' . $title . '</td><td>' . $date . '</td><td>' . $author . '</td><td>' . $tease . '</td><td>' . $source . '</td><td>' . $updated . '.</td><td><input type="button" value="View" onclick="location.href=\'crawler_article.php?id=' . $ID . '\';"/></td></tr>';
+			echo '<tr><td>' . $ID . '</td><td>' . $title . '</td><td>' . $date . '</td><td>' . $author . '</td><td>' . $tease . '</td><td>' . $source . '</td><td>' . $updated . '.</td><td><input type="button" value="View" onclick="location.href=\'crawler_article.php?id=' . $ID . '&page=' . $page . '\';"/></td></tr>';
 		}
 		echo '</table>';
 
@@ -210,4 +210,28 @@ function count_rows($mysqli_crawler) {
 	 	$count->close();
 	 	return $row_count[0];
 	 }
+}
+
+function display_article($mysqli_crawler, $ID){
+
+	if ($stmt = $mysqli_crawler->prepare("SELECT a.Content, a.References, a_s.Title, a_s.Author, a_s.Article_Date
+											FROM Article AS a
+											INNER JOIN Article_Summary AS a_s
+											WHERE a.Summary_ID = ? AND a_s.ID = ? LIMIT 1")) {
+
+		$stmt->bind_param('ii', $ID, $ID); // binds email variable to prepared statement (bind_param forces email to be a string, indicated by 's')
+		$stmt->execute(); //execute prepared SQL query
+		$stmt->store_result();
+
+		// get result from query
+		$stmt->bind_result($content, $ref, $title, $author, $date); // binds empty variables to result from prepared statement
+		$stmt->fetch(); //fetches results of prepared statement
+
+		echo '<input type="button" value="Go Back" onclick="location.href=\'crawler_results.php?page=' . $_GET["page"] . '\';"/>';
+		echo "<h1>" . $title . "</h1><hr>";
+		echo "<p><b>Date:</b> " . $date . ", <b>Author:</b> " . $author . "</p><hr>";
+		echo "<span class='content'>" . $content . "</span><hr>";
+		echo "<p><b>References:</b> <a href='" . $ref . "'>" . $ref . "</a></p><br>";
+		echo '<input type="button" value="Go Back" onclick="location.href=\'crawler_results.php?page=' . $_GET["page"] . '\';"/>';
+	}
 }
