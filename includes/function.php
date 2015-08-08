@@ -201,6 +201,32 @@ function display_crawler($mysqli_crawler, $page, $per_page) {
 
 }
 
+function display_search($mysqli_crawler, $title, $author, $date){
+
+	if ($stmt = $mysqli_crawler->prepare("SELECT * FROM Article_Summary WHERE Title LIKE ? AND Article_Date LIKE ? AND Author LIKE ?")) {
+		
+		// add SQL wildcards to search strings
+		$title = '%' . $title . '%';
+		$author = '%' . $author . '%';
+		$date = '%' . $date . '%';
+
+		$stmt->bind_param('sss', $title, $date, $author);
+		$stmt->execute();
+		$stmt->bind_result($ID, $title, $date, $author, $tease, $source, $updated);
+
+		//echo "<p>" . $title ."</p>";
+
+		echo '<table border="1" style="width:100%">';
+
+		while($stmt->fetch()){
+			echo '<tr><td>' . $ID . '</td><td>' . $title . '</td><td>' . $date . '</td><td>' . $author . '</td><td>' . $tease . '</td><td>' . $source . '</td><td>' . $updated . '.</td><td><input type="button" value="View" onclick="location.href=\'crawler_article.php?id=' . $ID . '\';"/></td></tr>';
+		}
+		echo '</table>';
+
+		$stmt->close();
+	}
+}
+
 function count_rows($mysqli_crawler) {
 
 	if ($count = $mysqli_crawler->query("SELECT COUNT(*) FROM Article_Summary")) {
